@@ -30,6 +30,7 @@ async function verifyJWT(req, res, next) {
 
 async function run() {
     try {
+        const todosCollection = client.db("todoDB").collection('todos');
         const usersCollection = client.db("todoDB").collection('users');
 
         //jwt sign in
@@ -44,6 +45,21 @@ async function run() {
             }
             res.status(403).send({ message: 'Unauthorized access', token: '' });
         });
+
+        //todos get api
+        app.get('/todos',async(req,res)=>{
+            const email = req.query.email;
+            const filter = {email};
+            const todos = await todosCollection.find(filter).toArray();
+            res.send(todos);
+        })
+        //todos post api
+        app.post('/todos', async (req, res) => {
+            const todo = req.body;
+            const result = await todosCollection.insertOne(todo);
+            res.send(result);
+        })
+
 
         //user add api
         app.post('/users', async (req, res) => {
