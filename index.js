@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const uri = "mongodb+srv://<username>:<password>@cluster0.leesidy.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.cbgpuyv.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function verifyJWT(req, res, next) {
@@ -47,9 +47,9 @@ async function run() {
         });
 
         //todos get api
-        app.get('/todos',async(req,res)=>{
+        app.get('/todos', async (req, res) => {
             const email = req.query.email;
-            const filter = {email};
+            const filter = { email };
             const todos = await todosCollection.find(filter).toArray();
             res.send(todos);
         })
@@ -66,7 +66,7 @@ async function run() {
             const user = req.body;
             const filter = { email: user.email };
             const alreadyUser = await usersCollection.find(filter).toArray();
-            if (alreadyUser) {
+            if (alreadyUser.length>0) {
                 return res.send({ message: "Already you have an account" });
             }
             const result = await usersCollection.insertOne(user);
